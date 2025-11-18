@@ -1,0 +1,5 @@
+{
+  "name": "Gemle - The AI Word Game",
+  "description": "A Wordle-style word guessing game with a 5x5 grid. Guess the 5-letter word in 5 tries. Use a one-time hint powered by AI to help you solve the puzzle. A new word is generated for each game using Gemini.",
+  "requestFramePermissions": []
+}
