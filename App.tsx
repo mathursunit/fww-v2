@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { GameGrid } from './components/GameGrid';
-import { Keyboard } from './components/Keyboard';
-import { MessageModal } from './components/MessageModal';
-import { HintConfirmationModal } from './components/HintConfirmationModal';
-import { StatsModal } from './components/StatsModal';
-import { getGameDataOfTheDay, getWordHint } from './services/geminiService';
-import { getGameDateKey, getTimeToNextGame } from './utils/dateUtils';
-import { WORD_LENGTH, MAX_GUESSES } from './constants';
-import type { GameState, KeyStatus, SavedGameState, GameStats } from './types';
+import React, { useState, useEffect, useRef } from 'react';
+import { GameGrid } from './components/GameGrid.tsx';
+import { Keyboard } from './components/Keyboard.tsx';
+import { MessageModal } from './components/MessageModal.tsx';
+import { HintConfirmationModal } from './components/HintConfirmationModal.tsx';
+import { StatsModal } from './components/StatsModal.tsx';
+import { getGameDataOfTheDay, getWordHint } from './services/geminiService.ts';
+import { getGameDateKey, getTimeToNextGame } from './utils/dateUtils.ts';
+import { WORD_LENGTH, MAX_GUESSES } from './constants.ts';
+import type { GameState, KeyStatus, SavedGameState, GameStats } from './types.ts';
 
 declare global {
   interface Window {
-    confetti?: (options: any) => void;
+    confetti?: any;
   }
 }
 
@@ -34,6 +34,18 @@ const App: React.FC = () => {
   const [nextGameTime, setNextGameTime] = useState<number>(0);
   const [stats, setStats] = useState<GameStats>({ gamesPlayed: 0, gamesWon: 0, currentStreak: 0, maxStreak: 0 });
   const [isStatsModalOpen, setIsStatsModalOpen] = useState<boolean>(false);
+  const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
+  const confettiInstanceRef = useRef<any>(null);
+
+  // Initialize confetti instance safely
+  useEffect(() => {
+    if (confettiCanvasRef.current && window.confetti && !confettiInstanceRef.current) {
+        confettiInstanceRef.current = window.confetti.create(confettiCanvasRef.current, {
+            resize: true,
+            useWorker: true,
+        });
+    }
+  }, []);
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -131,18 +143,19 @@ const App: React.FC = () => {
   }, [guesses, gameState, solution, isInitialized, solutionHint, hintUsed, maxGuesses]);
   
   useEffect(() => {
-    if (gameState === 'won' && window.confetti) {
+    if (gameState === 'won' && confettiInstanceRef.current) {
+      const confetti = confettiInstanceRef.current;
       const duration = 3 * 1000;
       const end = Date.now() + duration;
 
       (function frame() {
-        window.confetti!({
+        confetti({
           particleCount: 2,
           angle: 60,
           spread: 55,
           origin: { x: 0 },
         });
-        window.confetti!({
+        confetti({
           particleCount: 2,
           angle: 120,
           spread: 55,
@@ -276,6 +289,10 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen p-2 md:p-4 text-center overflow-hidden">
+      <canvas 
+        ref={confettiCanvasRef}
+        className="fixed top-0 left-0 w-full h-full pointer-events-none z-[9999]"
+      />
       {/* Header */}
       <header className="w-full max-w-md mx-auto relative mb-2 px-4 py-3 rounded-2xl glass-panel flex items-center justify-between">
         <div className="flex-1 flex justify-start">

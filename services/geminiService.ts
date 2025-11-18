@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { getGameDateKey } from '../utils/dateUtils';
+import { getGameDateKey } from '../utils/dateUtils.ts';
 
 const FALLBACK_WORDS = ['REACT', 'WORLD', 'HELLO', 'GREAT', 'PARTY', 'HOUSE', 'CHAIR', 'MUSIC', 'WATER', 'EARTH'];
 

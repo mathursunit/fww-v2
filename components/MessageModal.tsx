@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { GameState } from '../types';
+import type { GameState } from '../types.ts';
 
 interface CountdownTimerProps {
   targetTime: number;

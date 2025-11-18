@@ -1,5 +1,5 @@
 import React from 'react';
-import type { GameStats } from '../types';
+import type { GameStats } from '../types.ts';
 
 interface StatsModalProps {
   stats: GameStats;
