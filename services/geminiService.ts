@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { getGameDateKey } from '../utils/dateUtils';
 
 const FALLBACK_WORDS = ['REACT', 'WORLD', 'HELLO', 'GREAT', 'PARTY', 'HOUSE', 'CHAIR', 'MUSIC', 'WATER', 'EARTH'];
@@ -26,33 +26,6 @@ const selectDeterministicFallback = (dateKey: string): string => {
     return FALLBACK_WORDS[index];
 }
 
-export const getWordOfTheDay = async (): Promise<string> => {
-    const dateKey = getGameDateKey();
-    const genAI = getAi();
-    if (!genAI) {
-        return selectDeterministicFallback(dateKey);
-    }
-
-    try {
-        const response = await genAI.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: `Generate a single, common, 5-letter English word in lowercase for the date ${dateKey}. This must be the same word every time for the same date. Do not include any explanation, punctuation, or formatting. Just the word.`,
-        });
-        
-        const word = response.text?.trim().toLowerCase();
-
-        if (word && word.length === 5 && /^[a-z]{5}$/.test(word)) {
-            return word;
-        } else {
-            console.error("Gemini did not return a valid 5-letter word, using fallback. Response:", response.text);
-            return selectDeterministicFallback(dateKey);
-        }
-    } catch (error) {
-        console.error("Error fetching word from Gemini API:", error);
-        return selectDeterministicFallback(dateKey);
-    }
-};
-
 export const getWordHint = async (word: string): Promise<string> => {
     const genAI = getAi();
     if (!genAI) {
@@ -76,5 +49,58 @@ export const getWordHint = async (word: string): Promise<string> => {
     } catch (error) {
         console.error("Error fetching hint from Gemini API:", error);
         return "A mysterious force prevents a hint from appearing.";
+    }
+};
+
+export const getGameDataOfTheDay = async (): Promise<{ word: string, hint: string }> => {
+    const dateKey = getGameDateKey();
+    const genAI = getAi();
+    if (!genAI) {
+        const word = selectDeterministicFallback(dateKey);
+        const hint = await getWordHint(word);
+        return { word, hint };
+    }
+
+    try {
+        const response = await genAI.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: `For the date ${dateKey}, generate a single, common, 5-letter English word in lowercase. This must be the same word every time for the same date. Also, generate a short, cryptic, puzzle-like hint for this word. The hint should be a single sentence and must not include the word itself or any of its letters. For example, for 'CLOCK', a good hint is 'I have a face but no eyes, and hands but no arms.'`,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        word: {
+                            type: Type.STRING,
+                            description: "A 5-letter common English word in lowercase."
+                        },
+                        hint: {
+                            type: Type.STRING,
+                            description: "A cryptic hint for the word."
+                        }
+                    }
+                }
+            }
+        });
+        
+        const jsonStr = response.text?.trim();
+        if (!jsonStr) throw new Error("Empty response from Gemini");
+
+        const data = JSON.parse(jsonStr);
+        const { word, hint } = data;
+
+        if (word && word.length === 5 && /^[a-z]{5}$/.test(word) && hint) {
+            return { word, hint };
+        } else {
+            console.error("Gemini did not return valid data, using fallback. Response:", data);
+            const fallbackWord = selectDeterministicFallback(dateKey);
+            const fallbackHint = await getWordHint(fallbackWord);
+            return { word: fallbackWord, hint: fallbackHint };
+        }
+    } catch (error) {
+        console.error("Error fetching game data from Gemini API:", error);
+        const fallbackWord = selectDeterministicFallback(dateKey);
+        const fallbackHint = await getWordHint(fallbackWord);
+        return { word: fallbackWord, hint: fallbackHint };
     }
 };

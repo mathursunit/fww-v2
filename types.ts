@@ -11,6 +11,9 @@ export interface SavedGameState {
     guesses: string[];
     gameState: GameState;
     lastPlayed: string;
+    hint?: string;
+    hintUsed?: boolean;
+    maxGuesses?: number;
 }
 
 export interface GameStats {

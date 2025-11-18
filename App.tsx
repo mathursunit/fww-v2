@@ -4,7 +4,7 @@ import { Keyboard } from './components/Keyboard';
 import { MessageModal } from './components/MessageModal';
 import { HintConfirmationModal } from './components/HintConfirmationModal';
 import { StatsModal } from './components/StatsModal';
-import { getWordOfTheDay, getWordHint } from './services/geminiService';
+import { getGameDataOfTheDay, getWordHint } from './services/geminiService';
 import { getGameDateKey, getTimeToNextGame } from './utils/dateUtils';
 import { WORD_LENGTH, MAX_GUESSES } from './constants';
 import type { GameState, KeyStatus, SavedGameState, GameStats } from './types';
@@ -17,6 +17,7 @@ declare global {
 
 const App: React.FC = () => {
   const [solution, setSolution] = useState<string>('');
+  const [solutionHint, setSolutionHint] = useState<string>('');
   const [guesses, setGuesses] = useState<string[]>([]);
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [gameState, setGameState] = useState<GameState>('playing');
@@ -58,13 +59,29 @@ const App: React.FC = () => {
         setSolution(savedState.solution);
         setGuesses(savedState.guesses);
         setGameState(savedState.gameState);
+        setHintUsed(savedState.hintUsed ?? false);
+        setMaxGuesses(savedState.maxGuesses ?? MAX_GUESSES);
+
+        if (savedState.hint) {
+            setSolutionHint(savedState.hint);
+            if (savedState.hintUsed) {
+                setHintText(savedState.hint);
+            }
+        } else {
+            // Backwards compatibility for old saves without hints
+            const hintForOldSave = await getWordHint(savedState.solution);
+            setSolutionHint(hintForOldSave);
+            if (savedState.hintUsed) {
+                setHintText(hintForOldSave);
+            }
+        }
         
         const newKeyStatuses: KeyStatus = {};
         savedState.guesses.forEach(guess => {
             guess.split('').forEach((letter, index) => {
-                 if (savedState.solution[index] === letter) {
+                 if (savedState!.solution[index] === letter) {
                     newKeyStatuses[letter] = 'correct';
-                } else if (savedState.solution.includes(letter)) {
+                } else if (savedState!.solution.includes(letter)) {
                     if (newKeyStatuses[letter] !== 'correct') {
                         newKeyStatuses[letter] = 'present';
                     }
@@ -76,13 +93,17 @@ const App: React.FC = () => {
         setKeyStatuses(newKeyStatuses);
         
       } else {
-        setLoadingMessage("Loading today's word...");
-        const newWord = await getWordOfTheDay();
+        setLoadingMessage("Loading today's word and hint...");
+        const { word: newWord, hint: newHint } = await getGameDataOfTheDay();
         const upperWord = newWord.toUpperCase();
         setSolution(upperWord);
+        setSolutionHint(newHint);
         setGuesses([]);
         setGameState('playing');
         setKeyStatuses({});
+        setHintUsed(false);
+        setMaxGuesses(MAX_GUESSES);
+        setHintText('');
       }
 
       setNextGameTime(Date.now() + getTimeToNextGame());
@@ -102,9 +123,12 @@ const App: React.FC = () => {
       guesses,
       gameState,
       lastPlayed: gameDateKey,
+      hint: solutionHint,
+      hintUsed,
+      maxGuesses,
     };
     localStorage.setItem('gameState', JSON.stringify(currentState));
-  }, [guesses, gameState, solution, isInitialized]);
+  }, [guesses, gameState, solution, isInitialized, solutionHint, hintUsed, maxGuesses]);
   
   useEffect(() => {
     if (gameState === 'won' && window.confetti) {
@@ -222,19 +246,14 @@ const App: React.FC = () => {
     setIsHintModalOpen(true);
   };
 
-  const handleConfirmHint = async () => {
+  const handleConfirmHint = () => {
     setIsHintModalOpen(false);
     if (hintUsed || gameState !== 'playing') return;
     
-    setIsLoading(true);
-    setLoadingMessage('Generating your hint...');
-    const hint = await getWordHint(solution);
-    setHintText(hint);
+    setHintText(solutionHint);
     setHintUsed(true);
     setMaxGuesses(guesses.length + 1);
     handleMessage('Hint revealed! You have one guess left.');
-    setIsLoading(false);
-    setLoadingMessage('');
   };
 
   const handleCancelHint = () => {

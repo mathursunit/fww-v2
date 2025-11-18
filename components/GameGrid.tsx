@@ -28,30 +28,37 @@ const getTileStatus = (letter: string, index: number, solution: string): LetterS
 };
 
 const Tile: React.FC<TileProps> = ({ letter, status, isRevealed, index }) => {
-  // Glassmorphism styles for tiles
   const statusClasses = {
     correct: 'bg-green-500/60 border-green-400/50 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]',
     present: 'bg-yellow-500/60 border-yellow-400/50 text-white shadow-[0_0_15px_rgba(234,179,8,0.4)]',
     absent: 'bg-gray-700/60 border-gray-600/50 text-white/80',
-    empty: 'bg-white/5 border-white/10 text-white',
+    empty: 'bg-white/5 border-white/10',
     filled: 'bg-white/10 border-white/30 text-white shadow-[0_0_10px_rgba(255,255,255,0.1)]'
   };
 
   const animationDelay = `${index * 100}ms`;
-  const baseClasses = 'w-14 h-14 md:w-16 md:h-16 border-2 rounded-lg flex items-center justify-center text-3xl md:text-4xl font-bold uppercase transition-all duration-500 transform backdrop-blur-sm font-fredoka';
+
+  const flipperClasses = `relative w-14 h-14 md:w-16 md:h-16 transition-transform duration-500 [transform-style:preserve-3d] ${isRevealed ? '[transform:rotateX(180deg)]' : ''}`;
   
-  // If not revealed but has a letter, use 'filled' style
-  const currentStyle = !isRevealed && letter ? statusClasses.filled : (isRevealed ? statusClasses[status] : statusClasses.empty);
+  const faceClasses = 'absolute inset-0 w-full h-full rounded-lg flex items-center justify-center text-3xl md:text-4xl font-bold uppercase backdrop-blur-sm font-fredoka [backface-visibility:hidden] border-2 text-white';
   
-  const revealedClasses = `[transform:rotateX(180deg)] ${statusClasses[status]}`;
+  const frontStyle = !isRevealed && letter.trim() ? statusClasses.filled : statusClasses.empty;
+  const backStyle = statusClasses[status];
 
   return (
     <div className="[perspective:1000px]">
       <div 
-        className={`${baseClasses} ${isRevealed ? revealedClasses : currentStyle}`}
+        className={flipperClasses}
         style={{ transitionDelay: animationDelay }}
       >
-        <div className="[transform:rotateX(180deg)] drop-shadow-md">{letter}</div>
+        {/* Front Face */}
+        <div className={`${faceClasses} ${frontStyle}`}>
+          {letter}
+        </div>
+        {/* Back Face */}
+        <div className={`${faceClasses} [transform:rotateX(180deg)] ${backStyle}`}>
+          {letter}
+        </div>
       </div>
     </div>
   );
