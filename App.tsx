@@ -378,7 +378,7 @@ const App: React.FC = () => {
       `}</style>
 
       <div className="fixed bottom-2 right-2 text-xs text-white/20 font-mono select-none" aria-hidden="true">
-        v1.5
+        v1.6
       </div>
     </div>
   );
