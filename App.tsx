@@ -376,6 +376,10 @@ const App: React.FC = () => {
           animation: fadeIn 0.5s ease-out forwards;
         }
       `}</style>
+
+      <div className="fixed bottom-2 right-2 text-xs text-white/20 font-mono select-none" aria-hidden="true">
+        v1.5
+      </div>
     </div>
   );
 };
