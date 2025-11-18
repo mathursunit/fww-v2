@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WORD_LENGTH } from '../constants';
 import type { LetterStatus } from '../types';
@@ -29,24 +28,30 @@ const getTileStatus = (letter: string, index: number, solution: string): LetterS
 };
 
 const Tile: React.FC<TileProps> = ({ letter, status, isRevealed, index }) => {
+  // Glassmorphism styles for tiles
   const statusClasses = {
-    correct: 'bg-green-600 border-green-600',
-    present: 'bg-yellow-500 border-yellow-500',
-    absent: 'bg-gray-700 border-gray-700',
-    empty: 'bg-transparent border-gray-600',
+    correct: 'bg-green-500/60 border-green-400/50 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]',
+    present: 'bg-yellow-500/60 border-yellow-400/50 text-white shadow-[0_0_15px_rgba(234,179,8,0.4)]',
+    absent: 'bg-gray-700/60 border-gray-600/50 text-white/80',
+    empty: 'bg-white/5 border-white/10 text-white',
+    filled: 'bg-white/10 border-white/30 text-white shadow-[0_0_10px_rgba(255,255,255,0.1)]'
   };
 
   const animationDelay = `${index * 100}ms`;
-  const baseClasses = 'w-16 h-16 md:w-20 md:h-20 border-2 flex items-center justify-center text-3xl md:text-4xl font-bold uppercase transition-all duration-500 transform';
+  const baseClasses = 'w-14 h-14 md:w-16 md:h-16 border-2 rounded-lg flex items-center justify-center text-3xl md:text-4xl font-bold uppercase transition-all duration-500 transform backdrop-blur-sm font-fredoka';
+  
+  // If not revealed but has a letter, use 'filled' style
+  const currentStyle = !isRevealed && letter ? statusClasses.filled : (isRevealed ? statusClasses[status] : statusClasses.empty);
+  
   const revealedClasses = `[transform:rotateX(180deg)] ${statusClasses[status]}`;
 
   return (
     <div className="[perspective:1000px]">
       <div 
-        className={`${baseClasses} ${isRevealed ? revealedClasses : statusClasses['empty']}`}
+        className={`${baseClasses} ${isRevealed ? revealedClasses : currentStyle}`}
         style={{ transitionDelay: animationDelay }}
       >
-        <div className="[transform:rotateX(180deg)]">{letter}</div>
+        <div className="[transform:rotateX(180deg)] drop-shadow-md">{letter}</div>
       </div>
     </div>
   );
@@ -77,9 +82,13 @@ const Row: React.FC<RowProps> = ({ guess, currentGuess, solution, isCompleted, i
                         index={i}
                     />
                 ) : (
-                    <div key={i} className="w-16 h-16 md:w-20 md:h-20 border-2 border-gray-600 flex items-center justify-center text-3xl md:text-4xl font-bold uppercase">
-                        {letter}
-                    </div>
+                    <Tile 
+                        key={i} 
+                        letter={letter} 
+                        status="empty" 
+                        isRevealed={false}
+                        index={i}
+                    />
                 )
             ))}
         </div>
@@ -90,7 +99,7 @@ export const GameGrid: React.FC<GameGridProps> = ({ guesses, currentGuess, solut
   const emptyRows = Array(Math.max(0, maxGuesses - guesses.length - 1)).fill(null);
 
   return (
-    <div className="grid grid-rows-5 gap-2">
+    <div className="grid grid-rows-5 gap-2 p-2">
       {guesses.map((guess, i) => (
         <Row key={i} guess={guess} solution={solution} isCompleted />
       ))}
@@ -109,6 +118,9 @@ export const GameGrid: React.FC<GameGridProps> = ({ guesses, currentGuess, solut
         }
         .animate-shake {
           animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        .font-fredoka {
+            font-family: 'Fredoka One', cursive;
         }
       `}</style>
     </div>
