@@ -74,6 +74,12 @@
 </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Polyfill for environments where 'process' is not defined, like browsers.
+      if (typeof process === 'undefined') {
+        window.process = { env: {} };
+      }
+    </script>
     <script type="text/babel" data-type="module" data-presets="react,typescript" src="index.tsx"></script>
   </body>
 </html>
