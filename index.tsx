@@ -2579,7 +2579,7 @@ const App: React.FC = () => {
       {showStatsModal && <StatsModal stats={stats} onClose={() => setShowStatsModal(false)} />}
       {showEndGameModal && (
         <EndGameModal
-          gameState={gameState}
+          gameState={gameState} 
           solution={solution}
           onShare={shareResults}
         />
