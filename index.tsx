@@ -1816,7 +1816,7 @@ SCUBA,An apparatus for breathing underwater
 FIZZY,Having a bubbling or sparkling quality
 CHEEK,Either side of the face below the eye
 MUDDY,Covered in or full of mud
-FROND,The leaf or lealike part of a palm, fern, or similar plant
+FROND,The leaf or leaflike part of a palm, fern, or similar plant
 STICK,A thin piece of wood that has fallen or been cut from a tree
 STOIC,A person who can endure pain or hardship without showing their feelings or complaining
 PITHY,Concise and forcefully expressive
