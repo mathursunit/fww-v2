@@ -200,10 +200,12 @@ const StatsModal: React.FC<StatsModalProps> = ({ stats, onClose }) => (
 interface EndGameModalProps {
     gameState: GameState;
     solution: string;
+    solutionDefinition: string;
+    stats: GameStats;
     onShare: () => void;
 }
 
-const EndGameModal: React.FC<EndGameModalProps> = ({ gameState, solution, onShare }) => {
+const EndGameModal: React.FC<EndGameModalProps> = ({ gameState, solution, solutionDefinition, stats, onShare }) => {
     const [timeLeft, setTimeLeft] = useState(getTimeToNextGame());
 
     useEffect(() => {
@@ -230,22 +232,29 @@ const EndGameModal: React.FC<EndGameModalProps> = ({ gameState, solution, onShar
 
     return (
         <Modal title="" onClose={() => {}}>
-            <div className="text-center space-y-6 flex flex-col items-center">
+            <div className="text-center space-y-4 flex flex-col items-center">
                 <div className="space-y-2">
                     <h2 className="text-4xl font-['Fredoka_One']" style={{ color: isWin ? '#C4B5FD' : '#E2E8F0' }}>{heading}</h2>
                     <p className="text-gray-300">{message}</p>
                 </div>
                 
-                {!isWin && (
-                    <div className="pb-2">
-                        <p className="text-gray-400 text-sm">The word was:</p>
-                        <p className="text-2xl font-bold tracking-widest uppercase">{solution}</p>
-                    </div>
-                )}
+                <div className="pb-2">
+                    <p className="text-gray-400 text-sm">The word was:</p>
+                    <p className="text-2xl font-bold tracking-widest uppercase">{solution}</p>
+                </div>
+
+                <div className="text-center pb-2">
+                  <p className="text-sm font-semibold tracking-widest text-gray-400">DEFINITION</p>
+                  <p className="italic text-gray-300 px-2">{solutionDefinition}</p>
+                </div>
+
+                <div className="w-full pt-2">
+                  <StatsContent stats={stats} />
+                </div>
                 
                 <hr className="border-gray-700 w-full" />
                 
-                <div className="space-y-2 py-4">
+                <div className="space-y-2 py-2">
                     <p className="text-sm font-semibold tracking-widest text-gray-400">NEXT WORD IN</p>
                     <p className="text-5xl font-bold tracking-wider">{formatTime(timeLeft)}</p>
                 </div>
@@ -701,6 +710,8 @@ const App: React.FC = () => {
         <EndGameModal
           gameState={gameState} 
           solution={solution}
+          solutionDefinition={solutionDefinition}
+          stats={stats}
           onShare={shareResults}
         />
       )}
