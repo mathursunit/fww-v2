@@ -27,7 +27,7 @@ interface GameStats {
 }
 
 // === From constants.ts ===
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 const WORD_LENGTH = 5;
 const MAX_GUESSES = 5;
 
@@ -385,7 +385,7 @@ const GameGrid: React.FC<GameGridProps> = ({ guesses, currentGuess, solution, is
             const letter = guess[colIndex] || '';
             const status = isSubmittedRow ? getStatusForLetter(letter, colIndex, guesses[rowIndex]) : 'empty';
             const style = isSubmittedRow ? { transitionDelay: `${colIndex * 100}ms` } : {};
-            const invalidClass = isCurrentGuessRow && isInvalidGuess ? 'animate-shake !border-red-500' : '';
+            const invalidClass = isCurrentGuessRow && isInvalidGuess ? 'animate-shake !border-red-500 bg-red-900/40' : '';
             
             return (
               <div 
