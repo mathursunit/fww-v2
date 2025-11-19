@@ -341,9 +341,10 @@ interface GameGridProps {
   guesses: string[];
   currentGuess: string;
   solution: string;
+  isInvalidGuess: boolean;
 }
 
-const GameGrid: React.FC<GameGridProps> = ({ guesses, currentGuess, solution }) => {
+const GameGrid: React.FC<GameGridProps> = ({ guesses, currentGuess, solution, isInvalidGuess }) => {
   
   const getStatusForLetter = (letter: string, index: number, guess: string): LetterStatus => {
     if (!solution) return 'empty';
@@ -379,16 +380,18 @@ const GameGrid: React.FC<GameGridProps> = ({ guesses, currentGuess, solution }) 
         <div key={rowIndex} className="grid grid-cols-5 gap-1.5">
           {Array.from({ length: WORD_LENGTH }).map((_, colIndex) => {
             const isSubmittedRow = rowIndex < guesses.length;
-            const guess = isSubmittedRow ? guesses[rowIndex] : (rowIndex === guesses.length ? currentGuess : '');
+            const isCurrentGuessRow = rowIndex === guesses.length;
+            const guess = isSubmittedRow ? guesses[rowIndex] : (isCurrentGuessRow ? currentGuess : '');
             const letter = guess[colIndex] || '';
             const status = isSubmittedRow ? getStatusForLetter(letter, colIndex, guesses[rowIndex]) : 'empty';
             const style = isSubmittedRow ? { transitionDelay: `${colIndex * 100}ms` } : {};
+            const invalidClass = isCurrentGuessRow && isInvalidGuess ? 'animate-shake !border-red-500' : '';
             
             return (
               <div 
                 key={colIndex} 
                 style={style} 
-                className={`${getTileClass(status, letter)} ${isSubmittedRow ? 'animate-flip' : ''}`}
+                className={`${getTileClass(status, letter)} ${isSubmittedRow ? 'animate-flip' : ''} ${invalidClass}`}
               >
                 {letter}
               </div>
@@ -457,6 +460,7 @@ const App: React.FC = () => {
   const [stats, setStats] = useState<GameStats>({ gamesPlayed: 0, gamesWon: 0, currentStreak: 0, maxStreak: 0 });
   const [hint, setHint] = useState<string>('');
   const [hintUsed, setHintUsed] = useState<boolean>(false);
+  const [isInvalidGuess, setIsInvalidGuess] = useState<boolean>(false);
   const confettiRan = useRef(false);
 
   const { words, validWords } = useWordList();
@@ -575,14 +579,20 @@ const App: React.FC = () => {
 
   const handleKeyPress = useCallback((key: string) => {
     if (gameState !== 'playing' || currentGuess.length >= WORD_LENGTH && key !== 'ENTER' && key !== 'BACKSPACE') return;
+    setIsInvalidGuess(false);
 
     if (key === 'ENTER') {
       if (currentGuess.length !== WORD_LENGTH) {
         showToast('Not enough letters');
         return;
       }
+      if (guesses.includes(currentGuess)) {
+        showToast('Already guessed');
+        return;
+      }
       if (!validWords.has(currentGuess)) {
         showToast('Not in word list');
+        setIsInvalidGuess(true);
         return;
       }
       
@@ -689,7 +699,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-grow flex flex-col items-center justify-center gap-2 w-full max-w-md">
-        <GameGrid guesses={guesses} currentGuess={currentGuess} solution={solution} />
+        <GameGrid guesses={guesses} currentGuess={currentGuess} solution={solution} isInvalidGuess={isInvalidGuess} />
         <Legend />
         {hint && (
           <div className="p-3 text-center bg-gray-900 bg-opacity-50 rounded-lg w-full mt-2">
