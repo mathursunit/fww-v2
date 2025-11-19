@@ -2173,7 +2173,7 @@ const Logo: React.FC = () => (
         <span style={{ color: '#FBBF24' }}>Sun</span>
         <span style={{ color: '#60A5FA' }}>Sar</span>
       </h1>
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1 -mt-1">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1 -mt-1 animate-spin-slow">
         <circle cx="12" cy="12" r="5" fill="#FBBF24"/>
         <line x1="12" y1="1" x2="12" y2="4" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round"/>
         <line x1="12" y1="20" x2="12" y2="23" stroke="#FBBF24" strokeWidth="2" strokeLinecap="round"/>

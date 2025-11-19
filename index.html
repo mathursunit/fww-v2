@@ -75,6 +75,15 @@
         cursor: not-allowed;
       }
 
+      /* Sun animation */
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .animate-spin-slow {
+        animation: spin 10s linear infinite;
+      }
+
       /* Tile animation */
       @keyframes flip {
         0% { transform: rotateX(0deg); }
