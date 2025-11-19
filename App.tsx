@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { GameState, KeyStatus, GameStats, SavedGameState } from './types';
-import { MAX_GUESSES, WORD_LENGTH, APP_VERSION } from './constants';
-import { getGameDateKey } from './utils/dateUtils';
-import { useWordList, getWordOfTheDay } from './services/wordService';
-import GameGrid from './components/GameGrid';
-import Keyboard from './components/Keyboard';
-import Toast from './components/Toast';
-import StatsModal from './components/StatsModal';
-import EndGameModal from './components/EndGameModal';
-import Logo from './components/Logo';
-import Legend from './components/Legend';
-import StatsIcon from './components/icons/StatsIcon';
-import HintIcon from './components/icons/HintIcon';
+import { GameState, KeyStatus, GameStats, SavedGameState } from './types.ts';
+import { MAX_GUESSES, WORD_LENGTH, APP_VERSION } from './constants.ts';
+import { getGameDateKey } from './utils/dateUtils.ts';
+import { useWordList, getWordOfTheDay } from './services/wordService.ts';
+import GameGrid from './components/GameGrid.tsx';
+import Keyboard from './components/Keyboard.tsx';
+import Toast from './components/Toast.tsx';
+import StatsModal from './components/StatsModal.tsx';
+import EndGameModal from './components/EndGameModal.tsx';
+import Logo from './components/Logo.tsx';
+import Legend from './components/Legend.tsx';
+import StatsIcon from './components/icons/StatsIcon.tsx';
+import HintIcon from './components/icons/HintIcon.tsx';
 
 const App: React.FC = () => {
   const [solution, setSolution] = useState<string>('');

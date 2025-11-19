@@ -1,6 +1,6 @@
 import React from 'react';
-import { KEYBOARD_LAYOUT } from '../constants';
-import { KeyStatus } from '../types';
+import { KEYBOARD_LAYOUT } from '../constants.ts';
+import { KeyStatus } from '../types.ts';
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;

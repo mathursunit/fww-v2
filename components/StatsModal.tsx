@@ -1,6 +1,6 @@
 import React from 'react';
-import Modal from './Modal';
-import { GameStats } from '../types';
+import Modal from './Modal.tsx';
+import { GameStats } from '../types.ts';
 
 interface StatsModalProps {
   stats: GameStats;

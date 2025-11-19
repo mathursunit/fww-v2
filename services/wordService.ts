@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { WORD_LENGTH } from '../constants';
+import { WORD_LENGTH } from '../constants.ts';
 
 // Data is inlined to ensure offline availability and simplicity for this project structure.
 const WORD_LIST_DATA = `UNDID,Reversed a previous action

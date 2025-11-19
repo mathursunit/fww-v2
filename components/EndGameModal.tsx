@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Modal from './Modal';
-import { GameState } from '../types';
-import { getTimeToNextGame } from '../utils/dateUtils';
+import Modal from './Modal.tsx';
+import { GameState } from '../types.ts';
+import { getTimeToNextGame } from '../utils/dateUtils.ts';
 
 interface EndGameModalProps {
     gameState: GameState;

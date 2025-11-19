@@ -1,6 +1,6 @@
 import React from 'react';
-import { MAX_GUESSES, WORD_LENGTH } from '../constants';
-import { LetterStatus } from '../types';
+import { MAX_GUESSES, WORD_LENGTH } from '../constants.ts';
+import { LetterStatus } from '../types.ts';
 
 interface GameGridProps {
   guesses: string[];
